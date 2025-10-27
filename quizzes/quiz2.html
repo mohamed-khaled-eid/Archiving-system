@@ -1,34 +1,798 @@
-<h2>الفصل 1: Introduction to Statistical Methods</h2>
-<section>
-    <h3>شرح الفصل</h3>
-    <p><strong>Population:</strong> مجموعة البيانات التي تمثل كامل الكيان المراد دراسته.</p>
-    <p><strong>Sample:</strong> مجموعة بيانات تمثل جزء من السكان، تستخدم للتعميم.</p>
-    <p><strong>Variable:</strong> خاصية أو سمة يمكن أن تتغير بين العناصر المختلفة.</p>
-    <p>Types of Variables: Qualitative (Nominal, Ordinal) | Quantitative (Continuous, Discrete)</p>
-</section>
+// ---------------------------
+// الإعدادات الأساسية
+// ---------------------------
+let totalSeconds = 80 * 60;
+const form = document.getElementById("examForm");
+const timeDisplay = document.getElementById("time");
+const submitBtn = document.getElementById("submitBtn");
+const resultDiv = document.getElementById("result");
+let timer;
 
-<section>
-    <h3>الكويز</h3>
-    <div class="quiz">
-        <p>1. Population represents:</p>
-        <button onclick="checkAnswer(1,'wrong')">A sample</button>
-        <button onclick="checkAnswer(1,'correct')">The entire population</button>
-    </div>
-    <div class="quiz">
-        <p>2. A variable that can only take two categories is called:</p>
-        <button onclick="checkAnswer(2,'correct')">Dichotomous variable</button>
-        <button onclick="checkAnswer(2,'wrong')">Continuous variable</button>
-    </div>
-</section>
+// ---------------------------
+// مصفوفة الأسئلة (تقدر تعدلها براحتك)
+// ---------------------------
+const questions = [
+  // ---------- Multiple Choice Questions (Part 1) ----------
+  {
+    type: "mcq",
+    question: "What is the simplest definition of information?",
+    options: [
+      "Unprocessed data",
+      "Processed data that has meaning",
+      "Random symbols without purpose",
+      "Stored raw facts"
+    ],
+    answer: "Processed data that has meaning",
+    explanation: "المعلومة هي بيانات تمت معالجتها وتنظيمها بحيث تكون ذات معنى يمكن فهمه واستخدامه."
+  },
+  {
+    type: "mcq",
+    question: "Which of the following best represents information according to Chapter 2?",
+    options: [
+      "A set of unrelated numbers",
+      "Symbols arranged in a meaningful structure",
+      "Any image or sound without context",
+      "Random computer signals"
+    ],
+    answer: "Symbols arranged in a meaningful structure",
+    explanation: "المعلومات تُعرّف بأنها مجموعة من الرموز منظمة بطريقة تسمح بفهمها واستخلاص معنى منها."
+  },
+  {
+    type: "mcq",
+    question: "According to Edsger Dijkstra, what is the main function of computers?",
+    options: [
+      "To think and make decisions",
+      "To manipulate symbols",
+      "To create intelligence",
+      "To replace human memory"
+    ],
+    answer: "To manipulate symbols",
+    explanation: "ديكسترا قال إن وظيفة الحواسيب الأساسية هي التعامل مع الرموز وليس التفكير أو اتخاذ القرارات."
+  },
+  {
+    type: "mcq",
+    question: "What are the main components of information?",
+    options: [
+      "Data, Symbols, and Structure",
+      "Hardware, Software, and Users",
+      "Input, Output, and Processing",
+      "Numbers, Text, and Images"
+    ],
+    answer: "Data, Symbols, and Structure",
+    explanation: "المعلومة تتكون من بيانات ممثلة في رموز ومنظمة في بنية يمكن فهمها."
+  },
+  {
+    type: "mcq",
+    question: "Which of the following is NOT an example of a symbol conveying information?",
+    options: [
+      "A national flag",
+      "A musical note",
+      "A random noise",
+      "A punctuation mark"
+    ],
+    answer: "A random noise",
+    explanation: "الضوضاء العشوائية لا تنقل معنى أو معلومة مفهومة، على عكس الرموز أو العلامات."
+  },
+  {
+    type: "mcq",
+    question: "In information retrieval, what is the primary goal?",
+    options: [
+      "To find desired information efficiently",
+      "To delete outdated data",
+      "To generate random data samples",
+      "To replace human learning"
+    ],
+    answer: "To find desired information efficiently",
+    explanation: "الهدف من نظم استرجاع المعلومات هو الوصول إلى المعلومة المطلوبة بأقل وقت وجهد ممكن."
+  },
+  {
+    type: "mcq",
+    question: "Which type of data is highly structured and well-defined?",
+    options: [
+      "Text documents",
+      "Images and videos",
+      "Database records",
+      "Sound recordings"
+    ],
+    answer: "Database records",
+    explanation: "البيانات في قواعد البيانات تكون منظمة ومحددة البنية، بعكس النصوص أو الوسائط المتعددة."
+  },
+  {
+    type: "mcq",
+    question: "What is the main difference between data and information?",
+    options: [
+      "Information is raw, data is processed",
+      "Data is raw, information is processed",
+      "Both are the same",
+      "Data has meaning, information does not"
+    ],
+    answer: "Data is raw, information is processed",
+    explanation: "البيانات خام غير معالجة، أما المعلومة فهي نتيجة معالجة وتنظيم تلك البيانات."
+  },
+  {
+    type: "mcq",
+    question: "Which of the following is an example of unstructured data?",
+    options: [
+      "A hospital patient database",
+      "A spreadsheet of sales figures",
+      "A collection of news articles",
+      "An inventory list"
+    ],
+    answer: "A collection of news articles",
+    explanation: "المقالات النصية تُعد بيانات غير منظمة لأنها تعتمد على اللغة الطبيعية ومحتواها غير ثابت البنية."
+  },
+  {
+    type: "mcq",
+    question: "Which sense can convey information according to the text?",
+    options: ["Only vision", "Only hearing", "Any human sense", "Only touch"],
+    answer: "Any human sense",
+    explanation: "الفصل أوضح إن المعلومات يمكن نقلها من خلال أي حاسة بشرية مثل البصر، السمع، الشم، التذوق أو اللمس."
+  },
 
-<script>
-function checkAnswer(q, result){
-    if(result === 'correct'){
-        alert('إجابة صحيحة!');
-        localStorage.setItem('chapter1-quiz'+q, 'صحيح');
-    } else {
-        alert('إجابة خاطئة!');
-        localStorage.setItem('chapter1-quiz'+q, 'خاطئ');
+  // ---------- True or False ----------
+  {
+    type: "truefalse",
+    question: "Information can only be represented by text symbols.",
+    answer: "False",
+    explanation: "المعلومات يمكن تمثيلها بالرموز أو الصور أو الأصوات أو الروائح وليس النص فقط."
+  },
+  {
+    type: "truefalse",
+    question: "Information retrieval is the process of finding desired information from a store of data.",
+    answer: "True",
+    explanation: "استرجاع المعلومات هو عملية البحث عن المعلومة المطلوبة داخل قاعدة بيانات أو مخزن معلومات."
+  },
+  {
+    type: "truefalse",
+    question: "Unstructured data is always numerical and easy to analyze.",
+    answer: "False",
+    explanation: "البيانات غير المنظمة غالباً نصية أو وسائطية وصعبة التحليل مقارنة بالبيانات الرقمية المنظمة."
+  },
+  {
+    type: "truefalse",
+    question: "Symbols are essential in representing information.",
+    answer: "True",
+    explanation: "الرموز هي الطريقة التي نُمثّل بها المعلومات سواء كانت نصوصًا أو صورًا أو أصواتًا."
+  },
+  {
+    type: "truefalse",
+    question: "A library catalog can be considered a type of database.",
+    answer: "True",
+    explanation: "كتالوج المكتبة يحتوي على سجلات منظمة لكل كتاب، لذلك يعتبر قاعدة بيانات."
+  },
+
+  // ---------- Fill in the blanks ----------
+  {
+    type: "fill",
+    question: "Information is ______ data that has meaning and context.",
+    answer: "processed",
+    explanation: "المعلومة هي بيانات تمت معالجتها بحيث تكتسب معنى وسياقًا واضحًا."
+  },
+  {
+    type: "fill",
+    question: "The main function of computers according to Dijkstra is to ______ symbols.",
+    answer: "manipulate",
+    explanation: "ديكسترا أكد أن الكمبيوتر وظيفته الأساسية هي التعامل مع الرموز وليس التفكير."
+  },
+  {
+    type: "fill",
+    question: "Information retrieval involves finding desired ______ from stored data.",
+    answer: "information",
+    explanation: "استرجاع المعلومات يهدف إلى إيجاد المعلومات المطلوبة من البيانات المخزنة."
+  },
+
+  // ---------- Essay ----------
+  {
+    type: "essay",
+    question: "Explain the relationship between data, information, and knowledge.",
+    answer: "",
+    explanation: "العلاقة بينهم هي أن البيانات خام، والمعلومات هي بيانات تمت معالجتها وتنظيمها، والمعرفة هي الفهم الناتج من استخدام المعلومات."
+  },
+  {
+    type: "essay",
+    question: "Discuss the importance of structure in understanding information.",
+    answer: "",
+    explanation: "البنية تساعد في فهم الرموز وتنظيمها بحيث يمكن تفسير معناها بشكل trueيح، مثل ترتيب الكلمات في الجمل."
+  },
+  {
+    type: "essay",
+    question: "Describe how human senses contribute to information perception.",
+    answer: "",
+    explanation: "الحواس البشرية هي الوسيلة التي نستقبل بها المعلومات من العالم، مثل الرؤية والسمع واللمس والشم والتذوق."
+  }
+];
+// ---------- Multiple Choice Questions (Part 2) ----------
+questions.push(
+  {
+    type: "mcq",
+    question: "Which of the following best defines data?",
+    options: [
+      "Processed facts with meaning",
+      "Raw facts and figures",
+      "Information stored in memory",
+      "Organized knowledge"
+    ],
+    answer: "Raw facts and figures",
+    explanation: "البيانات هي حقائق وأرقام خام لم يتم معالجتها أو تنظيمها بعد."
+  },
+  {
+    type: "mcq",
+    question: "Which of these is an example of information rather than data?",
+    options: [
+      "A list of numbers: 3, 5, 7, 9",
+      "A report showing monthly sales trends",
+      "Random text characters",
+      "Unsorted names in a document"
+    ],
+    answer: "A report showing monthly sales trends",
+    explanation: "التقرير يقدّم بيانات معالجة ومُنظّمة توصل معنى واضح، وبالتالي يُعتبر معلومة."
+  },
+  {
+    type: "mcq",
+    question: "In an information retrieval system, what role does the user query play?",
+    options: [
+      "It retrieves data automatically",
+      "It defines what information the user is looking for",
+      "It deletes irrelevant data",
+      "It organizes files"
+    ],
+    answer: "It defines what information the user is looking for",
+    explanation: "استعلام المستخدم يحدد نوع المعلومة المطلوبة في نظام الاسترجاع."
+  },
+  {
+    type: "mcq",
+    question: "What is an example of structured information?",
+    options: [
+      "A relational database",
+      "A social media post",
+      "A hand-written letter",
+      "An image file"
+    ],
+    answer: "A relational database",
+    explanation: "قواعد البيانات العلائقية تحتوي على بنية واضحة ومنظمة تُسهل الوصول للمعلومة."
+  },
+  {
+    type: "mcq",
+    question: "Which element is crucial in transforming data into information?",
+    options: ["Processing", "Storing", "Deleting", "Copying"],
+    answer: "Processing",
+    explanation: "المعالجة هي الخطوة الأساسية لتحويل البيانات الخام إلى معلومات ذات معنى."
+  },
+  {
+    type: "mcq",
+    question: "What is the best example of symbolic representation?",
+    options: ["A country's flag", "A noise in the street", "A random pixel", "An error message"],
+    answer: "A country's flag",
+    explanation: "العلم يمثل رمزًا يعبر عن بلد ويُفهم معناه بسهولة."
+  },
+  {
+    type: "mcq",
+    question: "Which of the following systems retrieves information from large data collections?",
+    options: [
+      "Information Retrieval System",
+      "Operating System",
+      "Input/Output System",
+      "Data Transmission System"
+    ],
+    answer: "Information Retrieval System",
+    explanation: "نظام استرجاع المعلومات مصمم خصيصًا للبحث عن معلومات محددة من مجموعات ضخمة من البيانات."
+  },
+  {
+    type: "mcq",
+    question: "Which process converts signals or symbols into understandable meaning?",
+    options: [
+      "Interpretation",
+      "Transmission",
+      "Compression",
+      "Encryption"
+    ],
+    answer: "Interpretation",
+    explanation: "التفسير هو العملية التي نحول بها الرموز أو الإشارات إلى معنى نفهمه."
+  },
+  {
+    type: "mcq",
+    question: "Which type of database is used to handle multimedia information?",
+    options: [
+      "Relational database",
+      "Object-oriented database",
+      "Hierarchical database",
+      "Flat-file database"
+    ],
+    answer: "Object-oriented database",
+    explanation: "قواعد البيانات الكائنية قادرة على التعامل مع بيانات متعددة الأنواع مثل الصور والفيديو."
+  },
+  {
+    type: "mcq",
+    question: "What determines the value of information?",
+    options: [
+      "Its accuracy and relevance",
+      "Its storage size",
+      "Its format type",
+      "Its color or design"
+    ],
+    answer: "Its accuracy and relevance",
+    explanation: "قيمة المعلومة تعتمد على مدى دقتها وارتباطها بالموضوع المطلوب."
+  },
+
+  // ---------- True or False ----------
+  {
+    type: "truefalse",
+    question: "Information without context loses its meaning.",
+    answer: "True",
+    explanation: "بدون سياق تصبح المعلومة مجرد بيانات غير مفهومة."
+  },
+  {
+    type: "truefalse",
+    question: "All data is meaningful by itself.",
+    answer: "False",
+    explanation: "البيانات لا تكتسب معنى إلا بعد تنظيمها أو معالجتها لتصبح معلومات."
+  },
+  {
+    type: "truefalse",
+    question: "Information can exist without any form of representation.",
+    answer: "False",
+    explanation: "كل معلومة لازم يكون ليها تمثيل رمزي أو مادي يمكن إدراكه."
+  },
+  {
+    type: "truefalse",
+    question: "The structure of information helps in understanding it better.",
+    answer: "True",
+    explanation: "وجود بنية منظمة يسهل فهم المعلومة واستخدامها."
+  },
+  {
+    type: "truefalse",
+    question: "An Information Retrieval System works only with structured data.",
+    answer: "False",
+    explanation: "نظم الاسترجاع الحديثة قادرة على التعامل مع بيانات منظمة وغير منظمة."
+  },
+
+  // ---------- Fill in the blanks ----------
+  {
+    type: "fill",
+    question: "Data becomes information after it is ______ and organized.",
+    answer: "processed",
+    explanation: "المعالجة والتنظيم هما ما يحوّل البيانات إلى معلومات."
+  },
+  {
+    type: "fill",
+    question: "The flag of a country is an example of a ______ representation.",
+    answer: "symbolic",
+    explanation: "العلم يمثل رمزًا يدل على معنى معين وهو مثال على التمثيل الرمزي."
+  },
+  {
+    type: "fill",
+    question: "An Information Retrieval System helps users find the ______ information they need.",
+    answer: "relevant",
+    explanation: "هدف النظام هو إيجاد المعلومة ذات الصلة باحتياجات المستخدم."
+  },
+  {
+    type: "fill",
+    question: "Information has value when it is accurate and ______.",
+    answer: "relevant",
+    explanation: "قيمة المعلومة تعتمد على دقتها ومدى ارتباطها بالموضوع."
+  },
+
+  // ---------- Essay ----------
+  {
+    type: "essay",
+    question: "Explain the difference between structured and unstructured data with examples.",
+    answer: "",
+    explanation: "البيانات المنظمة لها تنسيق محدد مثل قواعد البيانات، أما غير المنظمة مثل النصوص والصور فلا تتبع هيكلًا ثابتًا."
+  },
+  {
+    type: "essay",
+    question: "Describe how an Information Retrieval System functions.",
+    answer: "",
+    explanation: "نظام استرجاع المعلومات يبحث عن بيانات ذات صلة بناءً على استعلام المستخدم من خلال خوارزميات بحث وفهرسة."
+  },
+  {
+    type: "essay",
+    question: "Why is processing an essential part of the information lifecycle?",
+    answer: "",
+    explanation: "بدون المعالجة تظل البيانات خامًا، بينما المعالجة تنظمها وتمنحها معنى يجعلها قابلة للاستخدام."
+  },
+  {
+    type: "essay",
+    question: "How does context affect the meaning of information?",
+    answer: "",
+    explanation: "السياق يحدد تفسير المعلومة، فالكلمة أو الرمز قد يتغير معناها حسب الموقف أو البيئة المستخدمة فيها."
+  }
+);
+
+// ---------- Multiple Choice Questions (Part 3) ----------
+questions.push(
+  {
+    type: "mcq",
+    question: "Which of the following best describes the main challenge of Information Retrieval Systems?",
+    options: [
+      "Storing unlimited data efficiently",
+      "Finding relevant information among massive data collections",
+      "Designing colorful interfaces",
+      "Translating data into multiple languages"
+    ],
+    answer: "Finding relevant information among massive data collections",
+    explanation: "التحدي الأكبر في نظم استرجاع المعلومات هو تحديد المعلومة الأكثر ارتباطًا وسط كم ضخم من البيانات."
+  },
+  {
+    type: "mcq",
+    question: "Which component of an Information Retrieval System is responsible for indexing data?",
+    options: [
+      "The search algorithm",
+      "The indexing subsystem",
+      "The query interface",
+      "The storage layer"
+    ],
+    answer: "The indexing subsystem",
+    explanation: "نظام الفهرسة هو المسؤول عن تنظيم البيانات لتسهيل البحث والاسترجاع بسرعة."
+  },
+  {
+    type: "mcq",
+    question: "Why is feedback important in modern information retrieval systems?",
+    options: [
+      "It helps improve the accuracy of future searches",
+      "It deletes irrelevant results automatically",
+      "It converts data into structured format",
+      "It visualizes the data for presentation"
+    ],
+    answer: "It helps improve the accuracy of future searches",
+    explanation: "التغذية الراجعة تساعد النظام على تعلم تفضيلات المستخدم وتحسين دقة النتائج."
+  },
+  {
+    type: "mcq",
+    question: "Which of the following is a key advantage of unstructured data?",
+    options: [
+      "It captures rich, real-world information such as emotions and opinions",
+      "It is faster to analyze than structured data",
+      "It uses less storage",
+      "It cannot be processed by AI"
+    ],
+    answer: "It captures rich, real-world information such as emotions and opinions",
+    explanation: "البيانات غير المنظمة مثل النصوص والمنشورات الاجتماعية تعكس محتوى غني ومعقد عن الواقع."
+  },
+  {
+    type: "mcq",
+    question: "What is the main difference between data retrieval and information retrieval?",
+    options: [
+      "Data retrieval focuses on exact matches, information retrieval focuses on relevance",
+      "They are identical processes",
+      "Information retrieval deals only with numbers",
+      "Data retrieval ignores user intent"
+    ],
+    answer: "Data retrieval focuses on exact matches, information retrieval focuses on relevance",
+    explanation: "استرجاع البيانات يعتمد على التطابق الحرفي، بينما استرجاع المعلومات يعتمد على مدى الصلة بمعنى البحث."
+  },
+  {
+    type: "mcq",
+    question: "Which metric is commonly used to evaluate information retrieval performance?",
+    options: [
+      "Precision and Recall",
+      "File size and storage speed",
+      "Latency and throughput",
+      "Color and design"
+    ],
+    answer: "Precision and Recall",
+    explanation: "يتم تقييم نظم الاسترجاع عادة باستخدام مقاييس الدقة (Precision) والاسترجاع (Recall)."
+  },
+  {
+    type: "mcq",
+    question: "Which of the following is an example of semi-structured data?",
+    options: [
+      "XML documents",
+      "Video files",
+      "Plain text notes",
+      "Images"
+    ],
+    answer: "XML documents",
+    explanation: "الـ XML يحتوي على عناصر منظمة جزئيًا مما يجعله مثالًا على البيانات شبه المنظمة."
+  },
+  {
+    type: "mcq",
+    question: "In the information retrieval process, what is the role of ranking algorithms?",
+    options: [
+      "They order search results by relevance",
+      "They compress stored data",
+      "They delete outdated information",
+      "They format documents"
+    ],
+    answer: "They order search results by relevance",
+    explanation: "خوارزميات الترتيب تنظم نتائج البحث بناءً على مدى صلتها بالاستعلام."
+  },
+  {
+    type: "mcq",
+    question: "Which modern technology significantly enhances information retrieval accuracy?",
+    options: [
+      "Artificial Intelligence",
+      "Bluetooth",
+      "Image compression",
+      "Blockchain"
+    ],
+    answer: "Artificial Intelligence",
+    explanation: "الذكاء الاصطناعي يساعد في تحليل السياق وتحسين فهم الاستعلامات وبالتالي دقة النتائج."
+  },
+  {
+    type: "mcq",
+    question: "What does the term 'semantic search' refer to?",
+    options: [
+      "Searching based on meaning rather than keywords",
+      "Searching only in structured data",
+      "Searching by file type",
+      "Random data exploration"
+    ],
+    answer: "Searching based on meaning rather than keywords",
+    explanation: "البحث الدلالي يعتمد على فهم المعنى والمحتوى بدلًا من الكلمات المفتاحية فقط."
+  },
+  {
+    type: "mcq",
+    question: "Which challenge occurs due to the exponential growth of data?",
+    options: [
+      "Information overload",
+      "Data simplicity",
+      "Symbol shortage",
+      "Reduced processing speed"
+    ],
+    answer: "Information overload",
+    explanation: "زيادة كمية البيانات بشكل هائل تؤدي إلى مشكلة تشبع المعلومات وصعوبة الوصول إلى المفيد منها."
+  },
+  {
+    type: "mcq",
+    question: "Which component improves the speed of retrieval by pre-organizing data?",
+    options: [
+      "Index",
+      "Cache memory",
+      "User interface",
+      "Query analyzer"
+    ],
+    answer: "Index",
+    explanation: "الفهرس هو العنصر الذي ينظم البيانات مسبقًا لتسريع عملية الاسترجاع."
+  },
+  {
+    type: "mcq",
+    question: "Which statement is true about the relevance feedback process?",
+    options: [
+      "It allows users to refine search results",
+      "It deletes user history",
+      "It sorts data alphabetically",
+      "It compresses documents"
+    ],
+    answer: "It allows users to refine search results",
+    explanation: "التغذية الراجعة من المستخدم تساعد النظام على تعديل النتائج لتناسب احتياجاته أكثر."
+  },
+  {
+    type: "mcq",
+    question: "Which of the following can be considered as knowledge?",
+    options: [
+      "Understanding derived from information",
+      "Raw measurements",
+      "Binary digits",
+      "Unprocessed data"
+    ],
+    answer: "Understanding derived from information",
+    explanation: "المعرفة هي الفهم الناتج من تحليل المعلومات واستخدامها."
+  },
+  {
+    type: "mcq",
+    question: "Why is noise considered a problem in information transfer?",
+    options: [
+      "It distorts or removes meaning from the message",
+      "It makes the message faster",
+      "It improves the signal",
+      "It adds context"
+    ],
+    answer: "It distorts or removes meaning from the message",
+    explanation: "الضوضاء تؤثر على وضوح المعلومة وتجعل الرسالة غير مفهومة."
+  },
+
+  // ---------- True or False ----------
+  {
+    type: "truefalse",
+    question: "Feedback in information retrieval helps systems learn from user behavior.",
+    answer: "True",
+    explanation: "التغذية الراجعة تساعد النظام على التعلم وتحسين نتائج البحث بمرور الوقت."
+  },
+  {
+    type: "truefalse",
+    question: "Information overload refers to the lack of available data.",
+    answer: "False",
+    explanation: "تشبع المعلومات يعني وجود كمية كبيرة جدًا من البيانات تجعل الوصول للمفيد صعبًا."
+  },
+  {
+    type: "truefalse",
+    question: "Semantic search relies on understanding context and meaning.",
+    answer: "True",
+    explanation: "البحث الدلالي يعتمد على فهم معنى الكلمات والعلاقات بينها للوصول لنتائج دقيقة."
+  },
+  {
+    type: "truefalse",
+    question: "Precision measures how many relevant documents were retrieved out of all retrieved documents.",
+    answer: "True",
+    explanation: "الدقة (Precision) تقيس نسبة النتائجالصحيحة من إجمالي النتائج المسترجعة."
+  },
+  {
+    type: "truefalse",
+    question: "Recall measures how many relevant documents were retrieved out of all relevant ones in the collection.",
+    answer: "True",
+    explanation: "الاسترجاع (Recall) يقيس نسبة المراجع ذات الصلة التي تم إيجادها فعلاً."
+  },
+
+  // ---------- Fill in the blanks ----------
+  {
+    type: "fill",
+    question: "The process of organizing data for faster search is called ______.",
+    answer: "indexing",
+    explanation: "الفهرسة هي عملية تنظيم البيانات لتسريع عمليات البحث والاسترجاع."
+  },
+  {
+    type: "fill",
+    question: "Semantic search focuses on the ______ of words rather than their form.",
+    answer: "meaning",
+    explanation: "البحث الدلالي يهتم بمعنى الكلمات وليس شكلها الحرفي فقط."
+  },
+  {
+    type: "fill",
+    question: "Precision and recall are used to evaluate ______ retrieval systems.",
+    answer: "information",
+    explanation: "يتم استخدام مقاييس الدقة والاسترجاع لتقييم أداء نظم استرجاع المعلومات."
+  },
+
+  // ---------- Essay ----------
+  {
+    type: "essay",
+    question: "Explain the concept of 'Information Overload' and its impact on decision-making.",
+    answer: "",
+    explanation: "تشبع المعلومات يجعل المستخدم غير قادر على التركيز أو اتخاذ قرارات الصحيحة بسبب كثرة البيانات المتاحة."
+  },
+  {
+    type: "essay",
+    question: "Discuss how Artificial Intelligence enhances Information Retrieval Systems.",
+    answer: "",
+    explanation: "الذكاء الاصطناعي يساعد في فهم الاستعلامات والسياق وتحسين ترتيب النتائج لتناسب احتياجات المستخدمين."
+  },
+  {
+    type: "essay",
+    question: "Analyze the importance of evaluation metrics like Precision and Recall in retrieval systems.",
+    answer: "",
+    explanation: "مقاييس التقييم مثل الدقة والاسترجاع أساسية لقياس فعالية النظام ومدى قدرته على إيجاد المعلومات ذات الصلة."
+  }
+);
+
+// ---------------------------
+// توليد الأسئلة تلقائيًا
+// ---------------------------
+function renderQuestions() {
+  questions.forEach((q, i) => {
+    const index = i + 1;
+    let html = `<div class="question"><h3>${index}. ${q.question}</h3>`;
+
+    if (q.type === "mcq") {
+      q.options.forEach(opt => {
+        html += `
+          <label><input type="radio" name="q${index}" value="${opt}"> ${opt}</label>
+        `;
+      });
+    } else if (q.type === "fill") {
+      html += `<input type="text" name="q${index}" placeholder="اكتب إجابتك هنا">`;
+    } else if (q.type === "truefalse") {
+      html += `
+        <label><input type="radio" name="q${index}" value="true"> true</label>
+        <label><input type="radio" name="q${index}" value="false"> false</label>
+      `;
+    } else if (q.type === "essay") {
+      html += `<textarea name="q${index}" rows="3" placeholder="اكتب إجابتك هنا"></textarea>`;
     }
+
+    html += `</div>`;
+    form.insertAdjacentHTML("beforeend", html);
+  });
 }
-</script>
+renderQuestions();
+
+// ---------------------------
+// تحميل البيانات المحفوظة
+// ---------------------------
+function loadSavedData() {
+  const savedTime = localStorage.getItem("remainingTime");
+  const savedAnswers = JSON.parse(localStorage.getItem("examAnswers"));
+
+  if (savedTime) totalSeconds = parseInt(savedTime);
+  if (savedAnswers) {
+    for (const [key, value] of Object.entries(savedAnswers)) {
+      const input = form.elements[key];
+      if (!input) continue;
+      if (input.type === "radio") {
+        const radios = form.querySelectorAll(`[name="${key}"]`);
+        radios.forEach(r => { if (r.value === value) r.checked = true; });
+      } else input.value = value;
+    }
+  }
+}
+
+// ---------------------------
+// حفظ الإجابات أول بأول
+// ---------------------------
+form.addEventListener("input", () => {
+  const answers = {};
+  for (let element of form.elements) {
+    if (!element.name) continue;
+    if (element.type === "radio") {
+      if (element.checked) answers[element.name] = element.value;
+    } else answers[element.name] = element.value;
+  }
+  localStorage.setItem("examAnswers", JSON.stringify(answers));
+});
+
+// ---------------------------
+// تشغيل المؤقت
+// ---------------------------
+function startTimer() {
+  timer = setInterval(() => {
+    totalSeconds--;
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    timeDisplay.textContent = `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
+    localStorage.setItem("remainingTime", totalSeconds);
+
+    if (totalSeconds <= 0) {
+      clearInterval(timer);
+      alert("انتهى الوقت! سيتم تسليم الامتحان تلقائيًا.");
+      submitBtn.click();
+    }
+  }, 1000);
+}
+
+// ---------------------------
+// عند التسليم
+// ---------------------------
+submitBtn.addEventListener("click", () => {
+  clearInterval(timer);
+  resultDiv.classList.remove("hidden");
+  resultDiv.innerHTML = "";
+
+  let score = 0;
+  const total = questions.length;
+
+  questions.forEach((q, i) => {
+    const name = "q" + (i + 1);
+    const userAnswer = form[name]?.value?.trim().toLowerCase();
+    const correct = q.answer.toLowerCase();
+
+    let isCorrect = false;
+    if (["mcq", "fill", "truefalse"].includes(q.type)) {
+      if (userAnswer === correct) {
+        isCorrect = true;
+        score++;
+      }
+    } else if (q.type === "essay") {
+      if (userAnswer) score += 0.5; // نص درجة للمحاولة
+    }
+
+    resultDiv.innerHTML += `
+      <div class="answer-result">
+        <p><strong>السؤال ${i + 1}:</strong> 
+        ${isCorrect ? "<span class='correct'>✔️ إجابتك صحيحة</span>" : "<span class='wrong'>❌ إجابتك خاطئة</span>"}</p>
+        <p>إجابتك: ${userAnswer || "<em>لم تجب</em>"}</p>
+        <p>الإجابةالصحيحة: <b>${q.answer}</b></p>
+        <p>💬 التفسير: ${q.explanation}</p>
+      </div>
+    `;
+  });
+
+  const percentage = Math.round((score / total) * 100);
+  resultDiv.innerHTML = `<h2>درجتك: ${score} من ${total} (${percentage}%)</h2>` + resultDiv.innerHTML;
+
+  localStorage.removeItem("remainingTime");
+  localStorage.removeItem("examAnswers");
+});
+
+// ---------------------------
+// بدء الامتحان
+// ---------------------------
+loadSavedData();
+startTimer();
+
+// ---------------------------
+// تنبيه عند محاولة إغلاق الصفحة
+// ---------------------------
+window.addEventListener("beforeunload", (e) => {
+  e.preventDefault();
+  e.returnValue = "هل أنت متأكد إنك تريد الخروج؟ سيتم حفظ إجاباتك تلقائيًا.";
+});
